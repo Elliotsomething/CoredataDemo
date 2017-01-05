@@ -1,0 +1,15 @@
+//
+//  PrefixHeader.pch
+//  CoredataTest
+//
+//  Created by yanghao on 15/12/7.
+//  Copyright © 2015年 justlike. All rights reserved.
+//
+
+#ifndef PrefixHeader_pch
+#define PrefixHeader_pch
+
+#import <CoreData/CoreData.h>
+
+
+#endif /* PrefixHeader_pch */
