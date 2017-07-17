@@ -8,8 +8,6 @@
 
 #import "AppDelegate.h"
 
-
-
 @interface AppDelegate ()
 
 @end
@@ -20,10 +18,10 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 	
 	
-	obj *o = [[obj alloc]init];
+	CoreDataManager *o = [[CoreDataManager alloc]init];
 	self.oo = o;
 	
-	 NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSFileManager *fileManager = [NSFileManager defaultManager];
 	NSURL *storeURL = [[self.oo applicationDocumentsDirectory]URLByAppendingPathComponent:@"Model.sqlite"];
 
 	if ([fileManager removeItemAtURL:storeURL error:nil]) {

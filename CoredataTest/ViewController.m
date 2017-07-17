@@ -9,7 +9,7 @@
 #import "ViewController.h"
 #import "ArInfo.h"
 #import "AppDelegate.h"
-#import "obj.h"
+#import "CoreDataManager.h"
 
 #import "testTime.h"
 typedef void(^callback)(id result);
@@ -29,6 +29,13 @@ static size_t const iterations = 1;
 @synthesize context;
 - (void)viewDidLoad {
 	[super viewDidLoad];
+    
+//    NSThread *thread = [[NSThread alloc]initWithTarget:self selector:@selector(runloop:) object:nil];
+//    [thread start];
+    
+    
+    
+    
 	// Do any additional setup after loading the view, typically from a nib.
 	
 	
@@ -36,12 +43,11 @@ static size_t const iterations = 1;
 	
 	
 	
-	[[obj defaultInstance] updateDB];
-	self.context = [obj defaultInstance].dealContext;
-	
-	
-	
-	extern uint64_t dispatch_benchmark(size_t count, void (^block)(void));
+//	[[CoreDataManager defaultInstance] updateDB];
+//	self.context = [CoreDataManager defaultInstance].dealContext;
+//	
+//	
+//	extern uint64_t dispatch_benchmark(size_t count, void (^block)(void));
 	
 	
 //	 uint64_t t_0 = dispatch_benchmark(iterations, ^{
@@ -60,26 +66,62 @@ static size_t const iterations = 1;
 //		NSLog(@"------------------%llu",t_0);
 
 
-	 uint64_t t_1 = dispatch_benchmark(iterations, ^{
-		 [context performBlock:^{
-			 
-			 NSError *error = nil;
-			 for (int i=0; i<10000; i++) {
-				 //插入
-				 ArInfo *arInfo = [NSEntityDescription insertNewObjectForEntityForName:@"ArInfo" inManagedObjectContext:context];
-				 arInfo.myid=@(i);
-				 arInfo.myname=@"object-c";
-				 if (![context save:&error]) {
-					 NSLog(@"%@",[error localizedDescription]);
-				 }
-			 }
-		 }];
-	 });
-	NSLog(@"------------------   %llu",t_1);
+//	 uint64_t t_1 = dispatch_benchmark(iterations, ^{
+//		 [context performBlock:^{
+//			 
+//			 NSError *error = nil;
+//			 for (int i=0; i<10000; i++) {
+//				 //插入
+//				 ArInfo *arInfo = [NSEntityDescription insertNewObjectForEntityForName:@"ArInfo" inManagedObjectContext:context];
+//				 arInfo.myid=@(i);
+//				 arInfo.myname=@"object-c";
+//				 if (![context save:&error]) {
+//					 NSLog(@"%@",[error localizedDescription]);
+//				 }
+//			 }
+//		 }];
+//	 });
+//	NSLog(@"------------------   %llu",t_1);
 
 //	NSLog(@"%@",[[obj defaultInstance] name]);
 	
+    
+    NSLog(@"222");
+    
 }
+
+
+- (void)runloop:(id)sender{
+    NSLog(@"%@",[NSThread currentThread]);
+    
+    
+    //创建一个NSTimer定时器,默认情况下NSTimer是不会执行的,只有把NSTimer添加到RunLoop中,由RunLoop管理执行
+    NSTimer * timer = [NSTimer timerWithTimeInterval:1 target:self selector:@selector(show) userInfo:nil repeats:YES];
+    
+    // 在当前线程中RunLoop添加一个timer, 并告诉runLoop, 这个timer只能在NSDefaultRunLoopMode模式下才能触发
+    // runLoop会找到NSDefaultRunLoopMode,然后把timer添加NSDefaultRunLoopMode中的Timer数组中
+    [[NSRunLoop currentRunLoop] addTimer:timer forMode:NSDefaultRunLoopMode];
+//
+//    //在当前线程中RunLoop添加一个timer, 并告诉runLoop, 这个timer只能在NSRunLoopCommonModes模式下才能触发
+//    //runLoop会找到NSDefaultRunLoopMode和UITrackingRunLoopMode
+//    //然后把timer添加NSDefaultRunLoopMode和UITrackingRunLoopMode中的Timer数组中
+//    [[NSRunLoop currentRunLoop] addTimer:timer forMode:NSRunLoopCommonModes];
+//    
+//    //利用此方法创建的NSTimer, 系统会自动放入当前线程中的currentRunLoop中,并且只能在NSDefaultRunLoop模式下才能触发
+//    NSTimer * timer1 = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(show) userInfo:nil repeats:YES];
+//    //虽然通过类方法scheduledTimerWithTimeInterval创建NSTimer,会自动添加到NSDefaultRunLoopMode模式中
+//    //但我们还是可以修改它的模式
+//    [[NSRunLoop currentRunLoop] addTimer:timer forMode:NSRunLoopCommonModes];
+    
+    [[NSRunLoop currentRunLoop] run];
+    
+    [[NSRunLoop currentRunLoop]addPort:[NSMachPort port] forMode:NSDefaultRunLoopMode];
+}
+
+- (void)show{
+    NSLog(@"1");
+}
+
 
 
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
@@ -87,14 +129,14 @@ static size_t const iterations = 1;
 //	invokeMethodNoRetForEffctive(self, @selector(insertObj:lala:), @"qwerq",@"111111", nil);
 //	invokeMethodHasRetForEffctive(self, @selector(frc:lala:), @"qwerq",@"111111", nil);
 	
-	callback call= ^(id result){
-		NSLog(@"111--callback");
-	};
+//	callback call= ^(id result){
+//		NSLog(@"111--callback");
+//	};
 	
 //	
 //	NSMutableArray *arr = [NSMutableArray array];
 //	[arr addObject:call];
-	getMethodArgType(self, @selector(frc:lala:), @"qwerq",call, nil);
+//	getMethodArgType(self, @selector(frc:lala:), @"qwerq",call, nil);
 	
 }
 
@@ -146,17 +188,17 @@ static size_t const iterations = 1;
 		
 		
 		dispatch_async(dispatch_get_main_queue(), ^{
-			NSManagedObject *objArInfo = [[[obj defaultInstance] getCurrentContextInThread] objectWithID:[arInfo111 objectID]];
+			NSManagedObject *objArInfo = [[[CoreDataManager defaultInstance] getCurrentContextInThread] objectWithID:[arInfo111 objectID]];
 
-			NSArray *fetchObject = [[[obj defaultInstance] getCurrentContextInThread] executeFetchRequest:fetchRequest error:nil];
+			NSArray *fetchObject = [[[CoreDataManager defaultInstance] getCurrentContextInThread] executeFetchRequest:fetchRequest error:nil];
 //			for (NSManagedObject *info in fetchObject) {
 //				NSLog(@"id:%@",[info valueForKey:@"myid"]);
 //				NSLog(@"name:%@",[info valueForKey:@"myname"]);
 //				
 //			}
 			
-			[[[obj defaultInstance] getCurrentContextInThread] deleteObject:objArInfo];
-			[[[obj defaultInstance] getCurrentContextInThread] save:nil];
+			[[[CoreDataManager defaultInstance] getCurrentContextInThread] deleteObject:objArInfo];
+			[[[CoreDataManager defaultInstance] getCurrentContextInThread] save:nil];
 			
 			
 	
